@@ -4,13 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
     <title>Document</title>
 </head>
 <body>
-    <script src="/socket.io/socket.io.js"></script>
+    <a-scene>
+        <a-assets>
+            <img id="bg" src="images/space.jpg">
+        </a-assets>
+        <a-sky src="images/space.jpg"></a-sky>
+    </a-scene>
+    <script src="node_modules/socket.io-client/dist/socket.io.js"></script>
     <script>
-        var socket = io();
-        socket.emit('chat message', 'pe y lo');
+        var socket = io('localhost:3000');
+        // socket.emit('chat message', 'msg');
+        socket.on('chat message', function(msg){
+            console.log(msg);
+        });
     </script>
 </body>
 </html>
