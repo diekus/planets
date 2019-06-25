@@ -1,11 +1,15 @@
 /* SOCKET SETUP */
 const socket = io('http://localhost:3000');
 let stars = [];
+let selfStar = null;
 
 socket.on('star-connected', data => {
+    selfStar = data[data.length - 1];
+    scene.activeCamera.position = new BABYLON.Vector3(selfStar.x, selfStar.y, selfStar.z);
     stars = data;
-    console.log(`you (${stars[stars.length - 1].id}) are now connected`);
-    console.log(data);
+    stars.splice(stars.length -1, 1);
+    console.log(`you (${selfStar.id}) are now connected`);
+    console.log(stars);
     stars.forEach(element => {
         createStar(element.id, element.r, element. x, element.y, element.z);        
     });
@@ -13,6 +17,7 @@ socket.on('star-connected', data => {
 
 socket.on('new-star-joined', newStar => {
     console.log(`star ${newStar.id} joined`);
+    stars.push(newStar);
     createStar(newStar.id, newStar.r, newStar.x, newStar.y, newStar.z);
 });
 
@@ -27,7 +32,7 @@ const engine = new BABYLON.Engine(canvas, true);
 
 let createScene = function(){
     let scene = new BABYLON.Scene(engine);
-    let  camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5,-10), scene);
+    let  camera = new BABYLON.UniversalCamera("UniversalCamera", new BABYLON.Vector3(0, 0, 0), scene);;
     camera.setTarget(BABYLON.Vector3.Zero());
     camera.attachControl(canvas, false);
     let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
@@ -54,7 +59,13 @@ let deleteStar = id => {
         if(stars[i].id == id) {
             stars.splice(i, 1);
             break;
-        } 
+        }
     }
-    //TODO: Deletes from BabylonJS scene
+    for(i = 0; i < scene.meshes.length; i++) { //Deletes from BabylonJS scene (scene.meshes[])
+        if(scene.meshes[i].id = id) {
+            scene.meshes.splice(i, 1);
+            break;
+        }
+    }
+    
 };
